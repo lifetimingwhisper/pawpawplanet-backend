@@ -12,12 +12,16 @@ const web = require('./web')
 const db = require('./db')
 const secret = require('./secret')
 const ecpay = require('./ecpay')
+const openAI = require('./openAI')
+const openWeather = require('./openWeather')
 
 const config = {
   web,
   db,
   secret,
-  ecpay
+  ecpay,
+  openAI,
+  openWeather
 }
 
 class ConfigManager {

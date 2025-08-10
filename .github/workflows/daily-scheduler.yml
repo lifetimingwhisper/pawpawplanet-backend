@@ -12,7 +12,7 @@ jobs:
     steps:
       - name: Wake Render (optional)
         run: |
-          curl https://pawpawplanetpetworld-backend.onrender.com/api/scheduler/ping \
+          curl https://pawpawplanet-backend.onrender.com/api/scheduler/ping \
             -H "Authorization: Bearer ${{ secrets.SCHEDULER_SECRET }}"  
 
       - name: Wait for Render to wake up
@@ -20,5 +20,5 @@ jobs:
 
       - name: Call close-due-orders API
         run: |
-          curl -X POST https://pawpawplanetpetworld-backend.onrender.com/api/scheduler/close-due-orders \
+          curl -X POST https://pawpawplanet-backend.onrender.com/api/scheduler/close-due-orders \
             -H "Authorization: Bearer ${{ secrets.SCHEDULER_SECRET }}"

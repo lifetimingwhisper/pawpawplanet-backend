@@ -4,7 +4,7 @@ const orderHelper = require('../lib/order-helpers')
 const paymentHelper = require('../lib/payment-helpers')
 const { Not, In } = require('typeorm')
 const dayjs = require('dayjs')
-
+const openai = require('../lib/openAI')
 
 async function PostOrderReview(req, res, next) {
   console.log('成功進入 PostOrderReview')
@@ -601,6 +601,31 @@ async function getOrderPayment(req, res, next) {
   }
 }
 
+// 為訂單產生天氣建議（由前端傳送時間地點和服務種類資訊；暫不針對個別訂單 id）
+async function generateWeatherAdviceByAI(req, res, next) {
+  try {
+    const { location, date, service } = req.body
+
+    if (!location || !date || !service) {
+      return res.status(200).json({
+        status: 'failed',
+        message: '提供資訊不足'
+      })
+    }
+
+    const response = await openai.generateWeatherAdviceByOpenAI(location, date, service)
+    return res.status(200).json({
+      status: 'success',
+      data: {
+        message: response.message ?? '抱歉，未產生任何天氣資訊'
+      }
+    })
+
+  } catch (error) {
+    next(error)
+  }
+}
+
 module.exports = {
   PostOrderReview,
   PostOrder,
@@ -611,5 +636,6 @@ module.exports = {
   getOrdersRequestedOnSameDate,
   postOrderPayment,
   postECPayResult,
-  getOrderPayment
+  getOrderPayment,
+  generateWeatherAdviceByAI
 }

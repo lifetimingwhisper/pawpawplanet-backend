@@ -12,5 +12,6 @@ router.get('/:id/same-date/requested', authenticateToken, orders.getOrdersReques
 router.post('/:id/payment', authenticateToken, orders.postOrderPayment)
 router.post('/:id/ecpay-result', orders.postECPayResult)
 router.get('/:id/payment', authenticateToken, orders.getOrderPayment)
+router.post('/weather-advice', orders.generateWeatherAdviceByAI)
 
 module.exports = router
