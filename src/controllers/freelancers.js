@@ -7,7 +7,7 @@ const order = require('./order')
 const dayjs = require('dayjs')
 const validation = require('../utils/validation')
 const districts = require('../data/taiwan-districts.json')
-
+const openai = require('../lib/openAI')
 
 function generateCalendar({ working_days, is_weekly_mode = false, orders = [] }) {
   const today = dayjs()
@@ -476,6 +476,33 @@ async function getSchedule(req, res, next) {
   }
 }
 
+// 依據保姆個人資料，自動產生自介建議
+async function generateIntroSuggestion(req, res, next) {
+  try {
+    const { intro } = req.body
+    if (!intro ) {
+      return res.status(200).json({
+        status: 'failed',
+        message: '提供資訊不足'
+      })
+    }
+
+
+    // intro = '非常喜歡小動物，家裡也有許多貓狗，希望有機會提供散步，到府照顧的服務'
+    const response = await openai.generateIntroSuggestionByOpenAI(intro)
+
+    return res.status(200).json({
+      status: 'success',
+      data: {
+        message: response.message ?? '抱歉，未產生任何自介建議'
+      }
+    })
+  } catch(error) {
+    console.error('getSchedule error:', error)
+    next(error)
+  }
+}
+
 module.exports = {
   getFreelancerProfile,
   postFreelancerProfile,
@@ -483,5 +510,6 @@ module.exports = {
   getOrders,
   createOrUpdateService,
   getFreelancerServiceDetail,
-  getSchedule
+  getSchedule,
+  generateIntroSuggestion
 }

@@ -103,9 +103,43 @@ async function generateWeatherAdviceByOpenAI(location, date, service) {
   }
 }
 
+async function generateIntroSuggestionByOpenAI(intro) {
+  try {
+    const input = [{
+      role: 'user',
+      content: `基於事實描述，幫助保姆將這段自我介紹 (${intro}) 延展，以溫暖讓人信任的口氣，讓飼主能安心的托付寵物；其中若提到動物請以擬人化的口吻稱呼他們；回覆只要是自介內容，不需要任何其他贅字`
+    }]
+
+    // AI 回應
+    const response = await singleton.responses.create({
+      model: 'gpt-4o',
+      instructions: `你是一個天氣助手，可以回答用戶關於天氣的問題。
+        當用戶詢問天氣相關問題時，找出其所在區域是台灣的哪個城市以及這個城市的英文名稱，若包含城市和行政區資訊要注意，資訊組合是否正確，(e.g. 台北市北屯，是不存在，錯誤的組合)，
+        並以城市為主，
+        判斷呼叫 get_weather 函式取得天氣數據。
+        使用繁體中文回答，簡潔友善。若資訊不完成或有誤，例如城市不在台灣或只有行政區沒有城市資訊，則回答指定資料有誤，相關天氣訊息無法提供`,
+      input,
+      temperature: 0.7,
+    })
+
+    // 返回 AI 回答
+    let originalString = response.output_text;
+    // 將所有換行符號替換成空字串
+    let cleanedString = originalString.replace(/[\n\r]+/g, '');
+   
+    return {
+      message: cleanedString,
+    };
+
+  } catch (error) {
+    throw error
+  }
+}
+
 module.exports = {
   singleton,
   availableFunctions,
 
-  generateWeatherAdviceByOpenAI
+  generateWeatherAdviceByOpenAI,
+  generateIntroSuggestionByOpenAI
 };
